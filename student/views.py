@@ -8,6 +8,8 @@ from django.urls import reverse_lazy
 
 from django.contrib.auth import authenticate,login,logout
 
+from instructor.models import Course
+
 
 # Create your views here
 
@@ -62,6 +64,8 @@ class IndexView(View):
 
     def get(self,request,*args,**kwargs):
 
-        return render(request,"index.html")
+        all_courses=Course.objects.all()
+
+        return render(request,"index.html",{"courses":all_courses})
 
    
