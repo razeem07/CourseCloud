@@ -1,19 +1,16 @@
-{%extends 'base.html'%} {%block mainblock%}
+{%extends 'base.html'%} {%block mainblock%} {% load embed_video_tags %}
 
 <!-- Course Content -->
 <div class="pt-20">
   <!-- Video Preview Section -->
-  <!--<div class="bg-gray-900 w-full">
+  <div class="bg-gray-900 w-full">
     <div class="max-w-screen-xl mx-auto px-4 py-8">
       <div class="aspect-w-16 aspect-h-9">
-        <img
-          src="/api/placeholder/1200/675"
-          alt="Course Preview"
-          class="w-full max-h-[600px] object-cover"
-        />
+        {%video coursedetail.thumbnail as course_video%} 
+        {%video course_video 'large'%} {%endvideo%}
       </div>
     </div>
-  </div>-->
+  </div>
 
   <!-- Course Info and Modules -->
   <div
@@ -77,11 +74,14 @@
         <div class="text-3xl font-bold mb-4 text-purple-700">
           {{coursedetail.price}}
         </div>
-        <button
-          class="w-full bg-purple-600 text-white py-3 rounded-lg mb-4 hover:bg-purple-700 transition duration-300"
-        >
-          Enroll Now
-        </button>
+        <a href="{%url 'add-to-cart' coursedetail.id%}">
+          <button
+            class="w-full bg-purple-600 text-white py-3 rounded-lg mb-4 hover:bg-purple-700 transition duration-300"
+          >
+            Enroll Now
+          </button>
+        <a>
+
         <button
           class="w-full border border-purple-600 text-purple-600 py-3 rounded-lg mb-6 hover:bg-purple-50 transition duration-300"
         >

@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 
 from django.contrib.auth import authenticate,login,logout
 
-from instructor.models import Course
+from instructor.models import Course,Cart
 
 
 # Create your views here
@@ -79,3 +79,22 @@ class CourseDetailView(View):
         course_instance=Course.objects.get(id=id)
 
         return render(request,"course_detail.html",{"coursedetail":course_instance})
+    
+
+class AddToCartView(View):
+
+    def get(self,request,*args,**kwargs):
+
+        id=kwargs.get("pk")
+
+        course_instance=Course.objects.get(id=id)
+
+        user_instance=request.user
+
+        #Cart.objects.create(course_object=course_instance,user=user_instance)
+
+        cart_instance,created=Cart.objects.get_or_create(course_object=course_instance,user=user_instance)
+
+        print(created)
+
+        return redirect("index")

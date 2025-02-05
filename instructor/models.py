@@ -96,3 +96,60 @@ class Lesson(models.Model):
         max_order=Lesson.objects.filter(module_object=self.module_object).aggregate(max=Max("order")).get("max") or 0
         self.order=max_order+1
         super().save(*args,**kwargs)
+
+
+
+#Child
+
+#cart_items=Cart.objects.filter(user=request.user)
+# basket_items=request.user.basket.all()
+
+class Cart(models.Model):
+
+    course_object=models.ForeignKey(Course,on_delete=models.CASCADE)
+
+    user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="basket")
+
+    created_date=models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.course_object.title
+
+
+
+
+# class Movie(models.Model):
+
+
+#     title=models.CharField(max_length=200)
+
+#     year=models.CharField(max_length=10)
+
+#     director=models.CharField(max_length=200)
+
+#     def __str__(self):
+#         return self.title
+
+# class Songs(models.Model):
+
+#     title=models.CharField(max_length=200)
+
+#     singers=models.CharField(max_length=200)
+
+#     movie_object=models.ForeignKey(Movie,on_delete=models.CASCADE,related_name="musics")
+
+#     def __str__(self):
+#         return self.title
+
+
+# # # orm query for creating a movie object
+
+# # kgf_movie_instance=Movie.objects.create(title="KGF",year="2017",director="prasanth")
+
+# # arm_movie_instance=Movie.objects.create(title="ARM",year="2024",director="jithin")
+
+# # # orm query for adding song instance
+
+# # kgf_movie_song_instance1=Songs.objects.create(title="kgf title song1",signers="singer1,singer2",movie_object=kgf_movie_instance)
+
+# # kgf_movie_song_instance2=Songs.objects.create(title="kgf intro  song1",signers="singer1,singer2",movie_object=kgf_movie_instance)
