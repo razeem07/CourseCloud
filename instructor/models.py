@@ -104,6 +104,7 @@ class Lesson(models.Model):
 #cart_items=Cart.objects.filter(user=request.user)
 # basket_items=request.user.basket.all()
 
+
 class Cart(models.Model):
 
     course_object=models.ForeignKey(Course,on_delete=models.CASCADE)

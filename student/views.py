@@ -10,6 +10,8 @@ from django.contrib.auth import authenticate,login,logout
 
 from instructor.models import Course,Cart
 
+from django.db.models import Sum
+
 
 # Create your views here
 
@@ -98,3 +100,35 @@ class AddToCartView(View):
         print(created)
 
         return redirect("index")
+
+
+
+class CartSummaryView(View):
+
+    def get(self,request,*args,**kwargs):
+
+        qs=request.user.basket.all()
+
+        cart_total=qs.values("course_object__price").aggregate(total=Sum("course_object__price")).get("total")
+
+        print("===========",cart_total)
+
+        #  or  qs=Cart.objects.filter(user=request.user)
+
+        return render(request,"cart-summary.html",{"carts":qs,"basket_total":cart_total})
+    
+
+class CartItemDeleteView(View):
+
+     def get(self,request,*args,**kwargs):
+
+       id=kwargs.get("pk")
+
+       Cart.objects.get(id=id).delete()
+
+       return redirect("cart-summary")
+     
+
+
+
+
