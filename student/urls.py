@@ -11,4 +11,6 @@ urlpatterns=[
    path('courses/<int:pk>/add-to-cart/',views.AddToCartView.as_view(),name="add-to-cart"),
    path("cart/summary/",views.CartSummaryView.as_view(),name="cart-summary"),
    path("cart/<int:pk>/remove/",views.CartItemDeleteView.as_view(),name="cart-item-remove"),
+   path("checkout/",views.CheckoutView.as_view(),name="checkout"),
+   path("mycourses/",views.MyCoursesView.as_view(),name="my-courses")
 ]

@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 
 from django.contrib.auth import authenticate,login,logout
 
-from instructor.models import Course,Cart
+from instructor.models import Course,Cart,Order
 
 from django.db.models import Sum
 
@@ -128,6 +128,37 @@ class CartItemDeleteView(View):
 
        return redirect("cart-summary")
      
+
+class CheckoutView(View):
+
+    def get(self,request,*args,**kwargs):
+
+        cart_items=request.user.basket.all()
+
+        order_total=sum([ci.course_object.price for ci in cart_items])
+
+        order_instance=Order.objects.create(student=request.user,total=order_total)
+
+        for ci in cart_items:
+
+            order_instance.course_objects.add(ci.course_object)
+
+            ci.delete()
+
+        order_instance.save()
+
+
+        return redirect("index")
+
+
+
+class MyCoursesView(View):
+
+    def get(self,request,*args,**kwargs):
+
+         qs = request.user.purchase.all()
+
+         return render(request,"mycourses.html",{"orders": qs})
 
 
 
