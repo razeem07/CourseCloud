@@ -1,14 +1,16 @@
 from django.contrib import admin
 from django.contrib.admin import sites
-from instructor.models import User, Category, Course, Module, Lesson,InstructorProfile
+from instructor.models import User, Category, Course, Module, Lesson,InstructorProfile,Order
 
 
 
 
 
+admin.site.register(Order)
 # Register User and Category
 admin.site.register(User)
 admin.site.register(Category)
+
 
 # Course Admin with Owner Auto-Assignment
 class CourseAdmin(admin.ModelAdmin):

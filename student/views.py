@@ -8,9 +8,18 @@ from django.urls import reverse_lazy
 
 from django.contrib.auth import authenticate,login,logout
 
-from instructor.models import Course,Cart,Order
+from instructor.models import Course,Cart,Order,Lesson,Module
 
 from django.db.models import Sum
+
+
+import razorpay
+
+
+RZP_KEY_ID = "rzp_test_Y7sGikK5i973t2"
+
+RZP_KEY_SECRET="qszlYhnYkYlosCluUfrlKOtU"
+
 
 
 # Create your views here
@@ -68,7 +77,12 @@ class IndexView(View):
 
         all_courses=Course.objects.all()
 
-        return render(request,"index.html",{"courses":all_courses})
+        purchased_courses=Order.objects.filter(student=request.user).values_list("course_objects",flat=True)
+
+        print("=============",purchased_courses)
+
+
+        return render(request,"index.html",{"courses":all_courses,"purchased_courses": purchased_courses})
 
    
 
@@ -148,6 +162,16 @@ class CheckoutView(View):
         order_instance.save()
 
 
+        if order_total>0:
+            # authenticate
+            client = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET))
+            # create a order
+            data = { "amount": int(order_total*100), "currency": "INR", "receipt": "order_rcptid_11" }
+            payment = client.order.create(data=data)
+            print(payment,"=============")
+
+
+
         return redirect("index")
 
 
@@ -159,6 +183,51 @@ class MyCoursesView(View):
          qs = request.user.purchase.all()
 
          return render(request,"mycourses.html",{"orders": qs})
+
+
+#localhost:8000/students/courses/1/watch?module=1&lesson5
+
+#?- optional query parameter
+
+class LessonDetailView(View):
+
+    def get(self,request,*args,**kwargs):
+
+        course_id=kwargs.get("pk")
+
+        course_instance=Course.objects.get(id=course_id)
+
+       # extracting lesson
+
+       #request.GET={"module 2",lesson:5}
+
+        # if "module" in request.GET:
+
+        #     module_id = request.GET.get("module")
+
+        # else:
+
+        #     module_id =1
+
+        # if "lesson" in request.GET:
+
+        #     lesson_id = request.GET.get("lesson")
+
+        # else:
+
+        #     lesson_id =1
+
+        # or
+
+        module_id=request.GET.get("module") if "module" in request.GET else course_instance.modules.first().id
+
+        module_instance= Module.objects.get(id=module_id,course_object=course_instance)
+
+        lesson_id=request.GET.get("lesson") if "lesson" in request.GET else module_instance.lessons.first().id
+
+        lesson_instance=Lesson.objects.get(id=lesson_id,module_object=module_instance)
+
+        return render(request,"lesson_detail.html",{"coursedetail":course_instance,"lesson": lesson_instance})
 
 
 
