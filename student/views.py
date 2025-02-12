@@ -168,11 +168,22 @@ class CheckoutView(View):
             # create a order
             data = { "amount": int(order_total*100), "currency": "INR", "receipt": "order_rcptid_11" }
             payment = client.order.create(data=data)
-            print(payment,"=============")
+           # print(payment,"=============")
+
+            rzp_id=payment.get("id")
+
+            order_instance.rzp_order_id=rzp_id
+
+            order_instance.save()
+
+            context={
+                "rzp_key_id":RZP_KEY_ID,
+                "amount": int(order_total*100),
+                "rzp_order_id": rzp_id,
+            }
 
 
-
-        return redirect("index")
+        return render(request,"payment.html",context)
 
 
 
@@ -231,4 +242,15 @@ class LessonDetailView(View):
 
 
 
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
+
+@method_decorator(csrf_exempt,name="dispatch")
+class PaymentVerificationView(View):
+
+    def post(self,request,*args,**kwargs):
+
+        print(request.POST,"======")
+
+        return redirect("index")
