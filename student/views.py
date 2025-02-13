@@ -182,8 +182,18 @@ class CheckoutView(View):
                 "rzp_order_id": rzp_id,
             }
 
+        
+        elif order_total ==0:
+
+            order_instance.is_paid=True
+            order_instance.save()
+
+
+
 
         return render(request,"payment.html",context)
+       
+
 
 
 
@@ -191,7 +201,7 @@ class MyCoursesView(View):
 
     def get(self,request,*args,**kwargs):
 
-         qs = request.user.purchase.all()
+         qs = request.user.purchase.filter(is_paid=True)
 
          return render(request,"mycourses.html",{"orders": qs})
 
@@ -252,5 +262,28 @@ class PaymentVerificationView(View):
     def post(self,request,*args,**kwargs):
 
         print(request.POST,"======")
+
+        client = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET))
+
+        try:
+            client.utility.verify_payment_signature(request.POST)
+
+            print("payment success")
+
+            rzp_order_id = request.POST.get("razorpay_order_id")
+
+            order_instance = Order.objects.get(rzp_order_id=rzp_order_id)
+
+            order_instance.is_paid=True
+
+            order_instance.save()
+
+            login(request,order_instance.student)
+
+        except:
+
+             print("failed")
+
+  
 
         return redirect("index")
