@@ -12,6 +12,15 @@ from instructor.models import Course,Cart,Order,Lesson,Module
 
 from django.db.models import Sum
 
+from django.utils.decorators import method_decorator
+
+
+from student.decorators import signin_required
+
+
+
+
+
 
 import razorpay
 
@@ -70,7 +79,7 @@ class SignInView(FormView):
                 return redirect("signin")
 
 
-
+@method_decorator(signin_required,name="dispatch")
 class IndexView(View):   
 
     def get(self,request,*args,**kwargs):
@@ -86,6 +95,7 @@ class IndexView(View):
 
    
 
+@method_decorator(signin_required,name="dispatch")
 class CourseDetailView(View):
 
     def get(self,request,*args,**kwargs):
@@ -97,6 +107,7 @@ class CourseDetailView(View):
         return render(request,"course_detail.html",{"coursedetail":course_instance})
     
 
+@method_decorator(signin_required,name="dispatch")
 class AddToCartView(View):
 
     def get(self,request,*args,**kwargs):
@@ -117,6 +128,7 @@ class AddToCartView(View):
 
 
 
+@method_decorator(signin_required,name="dispatch")
 class CartSummaryView(View):
 
     def get(self,request,*args,**kwargs):
@@ -132,6 +144,7 @@ class CartSummaryView(View):
         return render(request,"cart-summary.html",{"carts":qs,"basket_total":cart_total})
     
 
+@method_decorator(signin_required,name="dispatch")
 class CartItemDeleteView(View):
 
      def get(self,request,*args,**kwargs):
@@ -143,6 +156,7 @@ class CartItemDeleteView(View):
        return redirect("cart-summary")
      
 
+@method_decorator(signin_required,name="dispatch")
 class CheckoutView(View):
 
     def get(self,request,*args,**kwargs):
@@ -197,6 +211,7 @@ class CheckoutView(View):
 
 
 
+@method_decorator(signin_required,name="dispatch")
 class MyCoursesView(View):
 
     def get(self,request,*args,**kwargs):
@@ -210,6 +225,7 @@ class MyCoursesView(View):
 
 #?- optional query parameter
 
+@method_decorator(signin_required,name="dispatch")
 class LessonDetailView(View):
 
     def get(self,request,*args,**kwargs):
@@ -217,6 +233,12 @@ class LessonDetailView(View):
         course_id=kwargs.get("pk")
 
         course_instance=Course.objects.get(id=course_id)
+
+        purchased_courses=request.user.purchase.filter(is_paid=True).values_list("course_objects",flat=True)
+
+        if course_instance.id not in purchased_courses:
+
+            return redirect("index")
 
        # extracting lesson
 
@@ -287,3 +309,13 @@ class PaymentVerificationView(View):
   
 
         return redirect("index")
+
+
+
+class SignOutView(View):
+
+    def get(self,request,*args,**kwargs):
+
+        logout(request)
+
+        return redirect("signin")

@@ -99,7 +99,10 @@
         </div>
 
         <!-- Sign Up Form -->
-        <div id="signup-form" class="p-6 hidden">
+        <div id="signup-form" class="p-6">
+          {%for m in messages%} 
+            {{m}} 
+           {%endfor%}
           <form method="post" action="{%url 'student-register'%}">
             {%csrf_token%}
             <div class="space-y-4">
